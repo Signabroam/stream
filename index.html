@@ -1,21 +1,54 @@
-<doctype html>
-  <html>
-    <head>
-      <title>Signabroam Icecast</title>
-      <style>
-        body {
-    margin: 0;          
-}
-iframe {
-    display: block;       
-    background: #000;
-    border: none;        
-    height: 100vh;       
-    width: 100vw;
-}
-      </style>
-    </head>
-    <body>
-      <iframe src="http://serverhost.tail824f5b.ts.net/stream" width="100%" height="800px" frameborder="0"></iframe>
-    </body>
-  </html>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Signabroam Icecast</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      iframe {
+        display: block;
+        background: #000;
+        border: none;
+        height: 100vh;
+        width: 100vw;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe id="player" src="" frameborder="0"></iframe>
+
+    <script>
+      const urls = [
+        "http://serverhost.tail824f5b.ts.net/",
+        "http://serverhost.tail824f5b.ts.net:8200/"
+      ];
+
+      async function testURL(url) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s timeout
+          const response = await fetch(url, {
+            method: "HEAD",
+            mode: "no-cors", // Permet de tester même si le CORS bloque la réponse
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
+          return true; // Si pas d'erreur, on considère que ça marche
+        } catch (e) {
+          return false;
+        }
+      }
+
+      (async () => {
+        for (const url of urls) {
+          const works = await testURL(url);
+          if (works) {
+            document.getElementById("player").src = url;
+            break;
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
